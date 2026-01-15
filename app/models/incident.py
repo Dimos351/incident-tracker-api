@@ -25,6 +25,8 @@ class Incident(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text)
 
+
+
     status: Mapped[str] = mapped_column(
         String(50),
         default="open",
@@ -63,3 +65,4 @@ class Incident(Base):
     project = relationship("Project")
     creator = relationship("User", foreign_keys=[created_by_id])
     assignee = relationship("User", foreign_keys=[assigned_to_id])
+    tags = relationship("Tag", secondary="incident_tags", lazy="selectin")

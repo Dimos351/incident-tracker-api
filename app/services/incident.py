@@ -2,12 +2,13 @@ from app.core.permissions import require_role
 from app.models.incident import Incident
 from app.repositories.incident import IncidentRepository
 from app.repositories.project import ProjectRepository
-
+from app.repositories.tag import TagRepository
 
 class IncidentService:
     def __init__(self, session):
         self.incidents = IncidentRepository(session)
         self.projects = ProjectRepository(session)
+        self.tags = TagRepository(session)
 
     def create(self, membership, data):
         require_role(membership, {"owner", "admin", "manager"})
@@ -52,3 +53,16 @@ class IncidentService:
             limit=limit,
             offset=offset,
         )
+    
+    def set_tags(self, membership, incident, tag_names: list[str]):
+        require_role(membership, {"owner", "admin", "manager"})
+
+        tags = []
+        for name in tag_names:
+            tag = self.tags.get_or_create(
+                organization_id=membership.organization_id,
+                name=name,
+            )
+            tags.append(tag)
+
+        incident.tags = tags

@@ -1,23 +1,90 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
-from app.dependencies.organization import get_current_membership
 from app.dependencies.db import get_session
-from app.schemas.incident import IncidentCreate, IncidentRead
+from app.dependencies.organization import get_current_membership
+from app.models.user import User
+from app.models.membership import Membership
+from app.schemas.incident import (
+    IncidentCreate,
+    IncidentRead,
+    IncidentList,
+)
 from app.services.incident import IncidentService
 
-router = APIRouter(prefix="/organizations/{organization_id}/incidents")
 
-@router.post("/", response_model=IncidentRead)
+router = APIRouter()
+
+@router.post("", response_model=IncidentRead, status_code=status.HTTP_201_CREATED)
 def create_incident(
-    organization_id: int,
+    project_id: int,
     data: IncidentCreate,
+    session: Session = Depends(get_session),
     membership = Depends(get_current_membership),
-    session = Depends(get_session),
 ):
     service = IncidentService(session)
     incident = service.create(membership, data)
 
     if not incident:
         raise HTTPException(status_code=404, detail="Project not found")
+    
+    session.commit()
 
     return incident
+
+@router.get("", response_model=IncidentList)
+def list_incidents(
+    project_id: int,
+    limit: int = 20,
+    offset: int = 0,
+    session: Session = Depends(get_session),
+    membership = Depends(get_current_membership),
+):
+    sevrvice = IncidentService(session)
+
+    incidents = sevrvice.list_by_project(
+        membership=membership,
+        project_id=project_id,
+        limit=limit,
+        offset=offset,
+    )
+    if incidents is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    return {
+        "items": incidents,
+        "limit": limit,
+        "offset": offset,
+        "count": len(incidents),
+    }
+
+@router.post("/{incident_id}/tags", status_code=status.HTTP_204_NO_CONTENT)
+def set_incident_tags(
+    incident_id: int,
+    tag_name: list[str],
+    session: Session = Depends(get_session),
+    membership = Depends(get_current_membership),
+):
+    servise = IncidentService(session)
+
+    incident = servise.incidents.get(
+        incident_id=incident_id,
+        organization_id=membership.organization_id,
+    )
+
+    if not incident:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Incident not found",
+        )
+    
+    servise.set_tags(
+        membership=membership,
+        incident=incident,
+        tag_names=tag_name,
+    )
+
+    session.commit()

@@ -19,4 +19,11 @@ class OrganizationService:
         )
 
         self.session.add(membership)
+        self.session.commit()
         return org
+    
+    def list_user_organizations(self, user_id: int):
+        return self.repo.list_for_user(user_id)
+    
+    def get_user_organization(self, org_id: int, user_id: int):
+        return self.repo.get_for_user(org_id, user_id)

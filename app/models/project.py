@@ -8,18 +8,23 @@ class Project(Base):
     __tablename__ = "projects"
 
     id: Mapped[int] = mapped_column(primary_key=True) 
+
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
     organization_id = Mapped[int] = mapped_column(
-        ForeignKey("organizations.id", 
-        ondelete="CASCADE"), 
+        ForeignKey(
+            "organizations.id", 
+            ondelete="CASCADE",
+        ), 
         index=True, 
         nullable=False
     )
 
     organization = relationship("Organization")
+
     tasks = relationship(
         "Task",
         back_populates="project",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
+        lazy="selectin",
     )

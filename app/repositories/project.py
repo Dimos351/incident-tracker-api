@@ -1,5 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from typing import List
 
 from app.models.project import Project
 
@@ -8,13 +9,13 @@ class ProjectRepository:
     def __init__(self, session: Session):
         self.session = session
 
-    def list_by_org(self, organization_id: int):
+    def list_by_org(self, organization_id: int) -> List[Project]:
         stmt = select(Project).where(
             Project.organization_id == organization_id
         )
         return self.session.scalars(stmt).all()
 
-    def get(self, project_id: int, organization_id: int):
+    def get(self, project_id: int, organization_id: int) -> Project | None:
         stmt = select(Project).where(
             Project.id == project_id,
             Project.organization_id == organization_id,
@@ -22,7 +23,7 @@ class ProjectRepository:
 
         return self.session.scalar(stmt)
     
-    def create(self, name: str, organization_id: int):
+    def create(self, name: str, organization_id: int) -> Project:
         project = Project(
             name=name,
             organization_id=organization_id
@@ -30,3 +31,12 @@ class ProjectRepository:
         self.session.add(project)
         self.session.flush()
         return project
+    
+    def update(self, project: Project, *, name: str | None) -> Project:
+        if name is not None:
+            project.name = name
+        self.session.flush()
+        return project
+    
+    def delete(self, project: Project) -> None:
+        self.session.delete(project)

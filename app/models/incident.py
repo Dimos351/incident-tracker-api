@@ -25,8 +25,6 @@ class Incident(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text)
 
-
-
     status: Mapped[str] = mapped_column(
         String(50),
         default="open",

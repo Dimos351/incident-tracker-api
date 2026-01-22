@@ -54,10 +54,15 @@ class IncidentService:
             offset=offset,
         )
     
-    def set_tags(self, membership, incident, tag_names: list[str]):
+    def set_tags(
+            self, 
+            membership, 
+            incident: Incident, 
+            tag_names: list[str],
+    ):
         require_role(membership, {"owner", "admin", "manager"})
 
-        tags = []
+        tags: list = []
         for name in tag_names:
             tag = self.tags.get_or_create(
                 organization_id=membership.organization_id,

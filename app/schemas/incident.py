@@ -1,8 +1,9 @@
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
-
 from typing import List, Optional
 from enum import Enum
+
+from app.schemas.tag import TagRead
 
 
 class IncidentStatus(str, Enum):
@@ -42,12 +43,6 @@ class IncidentBase(BaseModel):
 # Create schema
 # -------------------------------
 class IncidentCreate(IncidentBase):
-    project_id: int = Field(
-        ...,
-        gt=0,
-        description="Project ID inside organixation",
-    )
-
     tags: List[str] = Field(
         default_factory=list,
         description="List of tag name"
@@ -113,14 +108,26 @@ class IncidentRead(BaseModel):
     id: int
     project_id: int
     title: str
-    description: Optional[str]
+    description: str | None
     status: IncidentStatus
     priority: IncidentPriority
     created_by_id: int | None
     assigned_to_id: int | None
-    tags: List[str]
+    tags: List[TagRead]
     created_at: datetime
     updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# -------------------------------
+# Get List schema
+# -------------------------------
+class IncidentList(BaseModel):
+    items: List[IncidentRead]
+    limit: int
+    offset: int
+    count: int
 
     class Config:
         from_attributes = True

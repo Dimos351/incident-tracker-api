@@ -7,7 +7,7 @@ from app.db.base import Base
 class IncidentTag(Base):
     __tablename__ = "incident_tags"
 
-    Incident_id: Mapped[int] = mapped_column(
+    incident_id: Mapped[int] = mapped_column(
         ForeignKey("incidents.id", ondelete="CASCADE"),
         primary_key=True,
     )

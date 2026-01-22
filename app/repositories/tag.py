@@ -7,13 +7,13 @@ class TagRepository:
     def __init__(self, session: Session):
         self.session = session
 
-    def get_or_create(self, organization_id: int, name: int) -> Tag:
+    def get_or_create(self, organization_id: int, name: str) -> Tag:
         stmt = select(Tag).where(
             Tag.organization_id == organization_id,
             Tag.name == name,
         )
-        tag = self.session.scalar(stmt)
 
+        tag = self.session.scalar(stmt)
         if tag: 
             return tag
         
@@ -25,4 +25,11 @@ class TagRepository:
         self.session.add(tag)
         self.session.flush()
         return tag
-        
+
+    def list_by_organization(self, organization_id: int):
+        stmt = (
+            select(Tag)
+            .where(Tag.organization_id == organization_id)
+            .order_by(Tag.name)
+        )       
+        return self.session.scalars(stmt).all()

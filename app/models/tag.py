@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -10,9 +10,13 @@ class Tag(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
 
     organization_id: Mapped[int] = mapped_column(
-        ForeignKey("organization.id", ondelete="CASCADE"),
+        ForeignKey("organizations.id", ondelete="CASCADE"),
         index=True,
         nullable=False,
     )
 
     name: Mapped[str] = mapped_column(String(50), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("organizations_id", "name"),
+    )

@@ -1,0 +1,85 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from typing import List
+
+from app.dependencies.db import get_session
+from app.dependencies.auth import get_current_user 
+from app.schemas.organization import (
+    OrganizationCreate,
+    OrganizationRead,
+)
+from app.schemas.membership import MembershipRead
+from app.services.organization import OrganizationService
+from repositories.organization import OrganizationRepository
+
+
+
+router = APIRouter()
+
+
+@router.post(
+    "", 
+    response_model=OrganizationCreate, 
+    status_code=status.HTTP_201_CREATED
+)
+def create_organization(
+    data: OrganizationCreate,
+    user = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    service = OrganizationService(repo=OrganizationRepository(session))
+    org = service.create_with_owner(user_id=data.user_id, name=data.name)
+
+    return org
+
+
+@router.get(
+    "",
+    response_model=List[OrganizationRead]
+)
+def list_user_organization(
+    user = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    service = OrganizationService(repo=OrganizationRepository(session))
+    return service.list_user_organizations(user_id=user.id)
+
+
+@router.get(
+    "/{org_id}",
+    response_model=OrganizationRead,
+)
+def get_user_organization(
+    org_id: int,
+    user = Depends(get_current_user),
+    session: Session = Depends(get_session),
+): 
+    service = OrganizationService(repo=OrganizationRepository(session))
+    org = service.get_user_organization(org_id=org_id, user_id=user.id)
+    if not org:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not a member of this organization"
+        )
+    return org
+
+@router.get(
+    "/{org_id}/members",
+    response_model=List[OrganizationRead]
+)
+def list_organization_members(
+    org_id: int,
+    user = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    service = OrganizationService(repo=OrganizationRepository(session))
+    org = service.list_user_organizations(org_id=org_id, user_id=user.id)
+    if not org:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not a member of this organization"
+        )
+    return [
+        MembershipRead.model_validate(membership)
+        for membership in org.memberships
+    ]

@@ -1,25 +1,20 @@
-from sqlalchemy.orm import Session
-
 from app.models.membership import Membership
 from app.repositories.organization import OrganizationRepository
 
 
 class OrganizationService:
-    def __init__(self, session: Session):
-        self.session = session
-        self.repo = OrganizationRepository(session)
+    def __init__(self, repo: OrganizationRepository):
+        self.repo = repo
 
-    def create_with_owner(self, name: str, user_id: int):
+    def create_with_owner(self, *, user_id: int, name: str,):
         org = self.repo.create(name)
 
-        membership = Membership(
+        self.repo.add_member(
+            organization_id=org.id,
             user_id=user_id,
-            organization_id = org.id,
             role="owner",
         )
 
-        self.session.add(membership)
-        self.session.commit()
         return org
     
     def list_user_organizations(self, user_id: int):

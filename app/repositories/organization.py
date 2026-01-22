@@ -13,6 +13,23 @@ class OrganizationRepository:
         self.session.add(org)
         self.session.flush()
         return org
+    
+    def add_member(
+        self, 
+        organization_id: int, 
+        user_id: int,
+        role: str,
+    ) -> Membership:
+        
+        membership = Membership(
+            organization_id=organization_id,
+            user_id=user_id,
+            role=role,
+        )
+
+        self.session.add(membership)
+        self.session.flush()
+        return membership
         
     def get_by_id(self, org_id: int) -> Organization | None:
         return self.session.get(Organization, org_id)

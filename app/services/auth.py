@@ -17,7 +17,7 @@ from app.core.security import (
 from app.core.config import settings
 
 
-class UserAlreadyExistsError:
+class UserAlreadyExistsError(Exception):
     pass
 
 class AuthService:

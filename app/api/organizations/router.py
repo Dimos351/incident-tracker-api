@@ -25,14 +25,14 @@ router = APIRouter()
 )
 def create_organization(
     data: OrganizationCreate,
-    user = Depends(get_current_user),
+    current_user = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     service = OrganizationService(
         org_repo=OrganizationRepository(session), 
         membership_repo=MembershipRepository(session)
     )
-    org = service.create_with_owner(user_id=data.user_id, name=data.name)
+    org = service.create_with_owner(user_id=current_user.id, name=data.name)
 
     return org
 

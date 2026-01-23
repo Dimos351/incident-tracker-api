@@ -11,11 +11,14 @@ class ProjectService:
 
     def create(self, membership, name: str):
         require_role(membership, {"owner", "admin", "manager"})
-
-        return self.repo.create(
+        project = self.repo.create(
             name=name,
             organization_id=membership.organization_id,
         )
+
+        self.session.commit()
+        self.session.refresh(project)
+        return project
     
     def list(self, membership):
         return self.repo.list_by_org(membership.organization_id)
@@ -39,10 +42,14 @@ class ProjectService:
             organization_id=membership.organization_id,
         )      
 
-        return self.repo.update(
+        update = self.repo.update(
             project, 
             name=name,
         )
+
+        self.session.commit()
+        self.session.refresh(update)
+        return update
     
 
     def delete(self, membership, project_id: int):

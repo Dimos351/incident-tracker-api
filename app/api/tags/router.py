@@ -19,7 +19,7 @@ def list_tags(
     tags = service.list_tags(membership)
     
     try:
-        return service.list_tags(membership)
+        return tags
     except PermissionDeniedError:
         raise HTTPException(
             status_code=403,

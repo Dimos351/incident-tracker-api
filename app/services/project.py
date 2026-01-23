@@ -53,6 +53,9 @@ class ProjectService:
             organization_id=membership.organization_id, 
         )
 
+        self.repo.delete(project)
+        self.session.commit()
+
     
     
     

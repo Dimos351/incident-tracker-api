@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.dependencies.organization import get_current_membership
@@ -16,6 +16,12 @@ def add_comment(
     membership = Depends(get_current_membership),
     session: Session = Depends(get_session),
 ):
+    if organization_id != membership.organization_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Organization ID does not match your membership",
+        )
+    
     service = CommentService(session)
     comment = service.add_comment(membership, incident_id, data.body)
 
@@ -33,6 +39,12 @@ def list_comments(
     membership = Depends(get_current_membership),
     session = Depends(get_session),
 ):
+    if organization_id != membership.organization_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Organization ID does not match your membership",
+        )
+
     service = CommentService(session)
     comments = service.list_comments(membership, incident_id, limit, offset)
 

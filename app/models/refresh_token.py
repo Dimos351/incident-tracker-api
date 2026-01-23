@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import String, ForeignKey, DateTime, Integer, func
+from sqlalchemy import String, ForeignKey, DateTime, Integer
 from datetime import datetime, timezone
 
 from app.db.base import Base
@@ -23,7 +23,7 @@ class RefreshToken(Base):
 
     created_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True), 
-        server_default=func.now, 
+        default=datetime.now(timezone.utc), 
         nullable=False,
     )
 

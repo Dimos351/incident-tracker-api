@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.dependencies.db import get_session
-from app.services.auth import AuthService
+from app.services.auth import AuthService, UserAlreadyExistsError
 from app.schemas.user import (
     UserCreate,
     UserRead,
@@ -12,12 +12,7 @@ from app.schemas.user import (
 )
 
 
-router = APIRouter(
-    prefix="/auth",
-    tags=["auth"],
-)
-
-
+router = APIRouter()
 
 # -------------------------
 # Register
@@ -31,9 +26,9 @@ def register_user(
     
     try:
         user = service.register_user(data)
-    except Exception:
+    except UserAlreadyExistsError:
         raise HTTPException(
-            status_codes=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             detail="User already exsists",
         )
     

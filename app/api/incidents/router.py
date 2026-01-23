@@ -3,8 +3,6 @@ from sqlalchemy.orm import Session
 
 from app.dependencies.db import get_session
 from app.dependencies.organization import get_current_membership
-from app.models.user import User
-from app.models.membership import Membership
 from app.schemas.incident import (
     IncidentCreate,
     IncidentRead,
@@ -40,9 +38,9 @@ def list_incidents(
     session: Session = Depends(get_session),
     membership = Depends(get_current_membership),
 ):
-    sevrvice = IncidentService(session)
+    service = IncidentService(session)
 
-    incidents = sevrvice.list_by_project(
+    incidents = service.list_by_project(
         membership=membership,
         project_id=project_id,
         limit=limit,
@@ -68,9 +66,9 @@ def set_incident_tags(
     session: Session = Depends(get_session),
     membership = Depends(get_current_membership),
 ):
-    servise = IncidentService(session)
+    service = IncidentService(session)
 
-    incident = servise.incidents.get(
+    incident = service.incidents.get(
         incident_id=incident_id,
         organization_id=membership.organization_id,
     )
@@ -81,10 +79,8 @@ def set_incident_tags(
             detail="Incident not found",
         )
     
-    servise.set_tags(
+    service.set_tags(
         membership=membership,
         incident=incident,
         tag_names=tag_name,
     )
-
-    session.commit()

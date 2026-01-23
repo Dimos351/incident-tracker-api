@@ -24,6 +24,7 @@ class TagRepository:
 
         self.session.add(tag)
         self.session.flush()
+        self.session.refresh(tag)
         return tag
 
     def list_by_organization(self, organization_id: int):

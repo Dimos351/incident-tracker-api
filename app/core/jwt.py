@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from app.core.config import settings
 from fastapi import HTTPException, status
@@ -7,7 +7,7 @@ def create_access_token(user_id: int) -> str:
     payload = {
         "sub": str(user_id),
         "type": "access",
-        "exp": datetime.utcnow()
+        "exp": datetime.now(timezone.utc)
         + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     }
 

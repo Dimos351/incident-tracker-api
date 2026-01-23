@@ -4,6 +4,10 @@ from app.repositories.incident import IncidentRepository
 from app.repositories.project import ProjectRepository
 from app.repositories.tag import TagRepository
 
+
+class ProjectNotFoundError(Exception):
+    pass
+
 class IncidentService:
     def __init__(self, session):
         self.incidents = IncidentRepository(session)
@@ -19,7 +23,7 @@ class IncidentService:
         )
 
         if not project:
-            return None
+            raise ProjectNotFoundError()
         
         incident = Incident(
             organization_id=membership.organization_id,
@@ -30,7 +34,9 @@ class IncidentService:
             created_by_id=membership.user_id,
         )
 
-        return self.incidents.create(incident)
+        self.incidents.create(incident)
+        self.session.commit()
+        return incident
     
     def list_by_project(
         self,

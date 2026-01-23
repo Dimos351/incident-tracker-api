@@ -1,6 +1,6 @@
 from sqlalchemy import String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.db.base import Base
 
@@ -13,7 +13,7 @@ class Organization(Base):
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=datetime.utcnow,
+        default=datetime.now(timezone.utc),
         nullable=False,
     )
 

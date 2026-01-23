@@ -29,7 +29,7 @@ class IncidentBase(BaseModel):
         description="Short incident title."
     )
 
-    description = Optional[str] = Field(
+    description: Optional[str] = Field(
         None,
         max_length=5000,
     )

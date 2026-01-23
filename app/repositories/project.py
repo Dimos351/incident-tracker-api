@@ -29,13 +29,11 @@ class ProjectRepository:
             organization_id=organization_id
         )
         self.session.add(project)
-        self.session.flush()
         return project
     
     def update(self, project: Project, *, name: str | None) -> Project:
         if name is not None:
             project.name = name
-        self.session.flush()
         return project
     
     def delete(self, project: Project) -> None:

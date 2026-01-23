@@ -26,7 +26,7 @@ class User(Base):
         nullable=False,
     )
 
-    memberships: Mapped[list["Membership"]] = relationship(
+    memberships = relationship(
         "Membership",
         back_populates="user",
         cascade="all, delete-orphan",

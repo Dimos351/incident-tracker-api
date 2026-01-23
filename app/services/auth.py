@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 
 from app.models.user import User
@@ -16,6 +16,9 @@ from app.core.security import (
 )
 from app.core.config import settings
 
+
+class UserAlreadyExistsError:
+    pass
 
 class AuthService:
     def __init__(self, session: Session):
@@ -64,12 +67,12 @@ class AuthService:
 
         token = self._get_valid_refresh_token(refresh_token)
 
-        token.revoked_at = datetime.utcnow()
+        token.revoked_at = datetime.now(timezone.utc)
 
         new_refresh_token = generate_refresh_token()
         new_refresh_token_hash = hash_token(new_refresh_token)
 
-        expires_at = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+        expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
 
         self.refresh_repo.create(
             user_id=token.user_id,
@@ -83,9 +86,9 @@ class AuthService:
     
     
     def logout(self, refresh_token: str) -> None:
-        token = self._get_valid_refresh_token(token)
-        token.revoked_at = datetime.utcnow()
-
+        token = self._get_valid_refresh_token(refresh_token)
+        token.revoked_at = datetime.now(timezone.utc)
+        
 
     def _get_valid_refresh_token(self, refresh_token: str) -> RefreshToken:
         token_obj = self.refresh_repo.get_by_token(refresh_token)
@@ -93,7 +96,7 @@ class AuthService:
             raise ValueError("Invalid refresh token")
         if token_obj.revoked_at is not None:
             raise ValueError("Token revoked")
-        if token_obj.expires_at < datetime.utcnow():
+        if token_obj.expires_at < datetime.now(timezone.utc):
             raise ValueError("Token expired")
-        return
+        return token_obj
 

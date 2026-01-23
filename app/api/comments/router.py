@@ -1,22 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
 from app.dependencies.organization import get_current_membership
 from app.dependencies.db import get_session
 from app.schemas.comment import CommentCreate, CommentRead
 from app.services.comment import CommentService
 
-router = APIRouter(
-    prefix="/organizations/{organization_id}/incidents/{incident_id}/comments",
-    tags=["comments"],
-)
+router = APIRouter()
 
-@router.post("/")
+@router.post("")
 def add_comment(
     organization_id: int,
     incident_id: int,
     data: CommentCreate,
     membership = Depends(get_current_membership),
-    session = Depends(get_session),
+    session: Session = Depends(get_session),
 ):
     service = CommentService(session)
     comment = service.add_comment(membership, incident_id, data.body)
@@ -26,7 +24,7 @@ def add_comment(
 
     return comment
 
-@router.get("/")
+@router.get("")
 def list_comments(
     organization_id: int,
     incident_id: int,

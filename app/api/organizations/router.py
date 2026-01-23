@@ -10,7 +10,8 @@ from app.schemas.organization import (
 )
 from app.schemas.membership import MembershipRead
 from app.services.organization import OrganizationService
-from repositories.organization import OrganizationRepository
+from app.repositories.organization import OrganizationRepository
+from app.repositories.membership import MembershipRepository 
 
 
 
@@ -27,7 +28,10 @@ def create_organization(
     user = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
-    service = OrganizationService(repo=OrganizationRepository(session))
+    service = OrganizationService(
+        org_repo=OrganizationRepository(session), 
+        membership_repo=MembershipRepository(session)
+    )
     org = service.create_with_owner(user_id=data.user_id, name=data.name)
 
     return org
@@ -41,7 +45,10 @@ def list_user_organization(
     user = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
-    service = OrganizationService(repo=OrganizationRepository(session))
+    service = OrganizationService(
+        org_repo=OrganizationRepository(session), 
+        membership_repo=MembershipRepository(session)
+    )
     return service.list_user_organizations(user_id=user.id)
 
 
@@ -54,7 +61,10 @@ def get_user_organization(
     user = Depends(get_current_user),
     session: Session = Depends(get_session),
 ): 
-    service = OrganizationService(repo=OrganizationRepository(session))
+    service = OrganizationService(
+        org_repo=OrganizationRepository(session), 
+        membership_repo=MembershipRepository(session)
+    )
     org = service.get_user_organization(org_id=org_id, user_id=user.id)
     if not org:
         raise HTTPException(
@@ -72,7 +82,10 @@ def list_organization_members(
     user = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
-    service = OrganizationService(repo=OrganizationRepository(session))
+    service = OrganizationService(
+        org_repo=OrganizationRepository(session), 
+        membership_repo=MembershipRepository(session)
+    )
     org = service.list_user_organizations(org_id=org_id, user_id=user.id)
     if not org:
         raise HTTPException(

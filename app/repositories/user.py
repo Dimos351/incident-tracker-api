@@ -25,4 +25,5 @@ class UserRepository:
 
         self.session.add(user)
         self.session.flush()
+        self.session.refresh(user)
         return user

@@ -10,7 +10,6 @@ class IncidentRepository:
 
     def create(self, incident: Incident) -> Incident:
         self.session.add(incident)
-        self.session.flush()
         return incident
 
     def get(self, *, incident_id: int, organization_id: int) -> Incident | None:

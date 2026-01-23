@@ -12,7 +12,7 @@ def get_current_membership(
         session = Depends(get_session)
 ):
     membership = MembershipRepository(session).get(
-        user_id=user,
+        user_id=user.id,
         organization_id=organization_id,
     )
 

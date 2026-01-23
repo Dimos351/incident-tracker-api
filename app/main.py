@@ -40,8 +40,8 @@ def create_app() -> FastAPI:
     app.include_router(users_router, prefix="/users", tags=["Users"])
     app.include_router(org_router, prefix="/organizations", tags=["Organizations"])
     app.include_router(projects_router, prefix="/organizations/{organization_id}/projects",tags=["Projects"])
-    app.include_router(incidents_router, prefix="/organization/{organization_id}/projects/{project_id}/incidents", tags=["Incidents"])
-    app.include_router(comments_router, prefix="/organization/{organization_id}/incident/{incident_id}/comments", tags=["Comments"])
+    app.include_router(incidents_router, prefix="/organizations/{organization_id}/projects/{project_id}/incidents", tags=["Incidents"])
+    app.include_router(comments_router, prefix="/organizations/{organization_id}/incident/{incident_id}/comments", tags=["Comments"])
     app.include_router(tags_router, prefix="/organizations/{organization_id}/tags", tags=["Tags"])
 
     return app

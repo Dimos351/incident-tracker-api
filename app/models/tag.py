@@ -18,5 +18,5 @@ class Tag(Base):
     name: Mapped[str] = mapped_column(String(50), nullable=False)
 
     __table_args__ = (
-        UniqueConstraint("organizations_id", "name"),
+        UniqueConstraint("organization_id", "name"),
     )

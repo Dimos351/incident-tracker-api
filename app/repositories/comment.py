@@ -15,6 +15,7 @@ class CommentRepository:
         )
         self.session.add(comment)
         self.session.flush()
+        self.session.refresh(comment)
         return comment
 
     def list_by_incident(self, incident_id: int, limit: int, offset: int):

@@ -34,7 +34,7 @@ class IncidentBase(BaseModel):
         max_length=5000,
     )
 
-    priority = IncidentPriority = Field(
+    priority: IncidentPriority = Field(
         IncidentPriority.medium,
         description="Incident priority"
     )
